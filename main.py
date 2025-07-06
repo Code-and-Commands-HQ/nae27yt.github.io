@@ -12,9 +12,13 @@ import os
 import sys
 import signal
 from datetime import datetime
+from dotenv import load_dotenv
 from bot_config import BotConfig
 from utils.postgres_database import PostgreSQLManager
 from web_dashboard import WebDashboard
+
+# Load environment variables from .env file
+load_dotenv()
 
 # Configure logging with better formatting
 logging.basicConfig(

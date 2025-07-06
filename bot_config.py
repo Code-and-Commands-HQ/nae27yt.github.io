@@ -5,12 +5,16 @@ Contains all configuration settings for the Discord bot with validation
 
 import os
 from typing import List, Dict, Any
+from dotenv import load_dotenv
+
+# Load environment variables from .env file
+load_dotenv()
 
 class BotConfig:
     """Enhanced configuration class for the Discord bot"""
     
     # Bot settings
-    COMMAND_PREFIX = "!"
+    COMMAND_PREFIX = os.getenv('BOT_COMMAND_PREFIX', '!')
     BOT_TOKEN = os.getenv('DISCORD_BOT_TOKEN', '')
     
     # Cooldown settings (in seconds)
@@ -63,15 +67,15 @@ class BotConfig:
     ROLE_HIERARCHY_PROTECTION = True
     
     # Logging settings
-    LOG_LEVEL = 'INFO'
-    LOG_FILE = 'bot.log'
+    LOG_LEVEL = os.getenv('LOG_LEVEL', 'INFO')
+    LOG_FILE = os.getenv('LOG_FILE', 'bot.log')
     LOG_MAX_SIZE = 10 * 1024 * 1024  # 10MB
     LOG_BACKUP_COUNT = 5
     
     # Web dashboard settings
-    DASHBOARD_HOST = '0.0.0.0'
-    DASHBOARD_PORT = 5000
-    DASHBOARD_DEBUG = False
+    DASHBOARD_HOST = os.getenv('DASHBOARD_HOST', '0.0.0.0')
+    DASHBOARD_PORT = int(os.getenv('DASHBOARD_PORT', '5000'))
+    DASHBOARD_DEBUG = os.getenv('DASHBOARD_DEBUG', 'False').lower() == 'true'
     
     # Security settings
     ALLOWED_FILE_EXTENSIONS = ['.txt', '.log', '.json']

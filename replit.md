@@ -31,9 +31,10 @@ The application follows a modular monolithic architecture with clear separation 
 - **Integrations**: Database manager and web dashboard integration
 
 ### Configuration (`bot_config.py`)
-- **Purpose**: Comprehensive configuration management
-- **Architecture**: Static configuration class with validation
+- **Purpose**: Comprehensive configuration management with environment variable support
+- **Architecture**: Static configuration class with validation and .env file integration
 - **Settings**: Extended cooldowns, rate limiting, embed limits, permissions, colors, logging, and database paths
+- **Environment Variables**: Configurable bot prefix, log levels, dashboard settings, and security options
 - **Validation**: Input validation limits and security settings
 
 ### Command System
@@ -94,6 +95,20 @@ The application follows a modular monolithic architecture with clear separation 
 2. **Role Management**: Role assignment request → Protection status check → Permission validation → Database logging → Role assignment/removal
 3. **Web Dashboard**: Real-time data collection → WebSocket broadcasting → Frontend updates → User interaction handling
 4. **Database Operations**: Command execution → Data validation → Async database writes → Result caching
+
+## Environment Variables
+
+The bot uses a `.env` file for configuration management. Key variables include:
+
+- **DISCORD_BOT_TOKEN**: Your Discord bot token (required)
+- **DATABASE_URL**: PostgreSQL connection string
+- **DASHBOARD_HOST**: Web dashboard host (default: 0.0.0.0)
+- **DASHBOARD_PORT**: Web dashboard port (default: 5000)
+- **BOT_COMMAND_PREFIX**: Bot command prefix (default: !)
+- **LOG_LEVEL**: Logging level (default: INFO)
+- **LOG_FILE**: Log file path (default: bot.log)
+
+Copy `.env.example` to `.env` and configure your specific values.
 
 ## External Dependencies
 
