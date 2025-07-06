@@ -58,11 +58,12 @@ The application follows a modular monolithic architecture with clear separation 
   - `/list-protected-roles`: View all protected roles in server
 - **Security**: Permission validation and role hierarchy checks
 
-### Database Layer (`utils/database.py`)
+### Database Layer (`utils/postgres_database.py`)
 - **Purpose**: Persistent data storage for bot state and configuration
-- **Architecture**: Async SQLite database with connection pooling
-- **Features**: Protected roles storage, role assignment logging, command usage tracking
-- **Tables**: Protected roles, role assignments, command usage statistics
+- **Architecture**: Async PostgreSQL database with connection pooling
+- **Features**: Protected roles storage, role assignment logging, command usage tracking, error logging, bot statistics history
+- **Tables**: Protected roles, role assignments, command usage, bot statistics, error logs, guild settings
+- **Performance**: Optimized with indexes for high-performance queries
 
 ### Utility Components
 
@@ -97,10 +98,10 @@ The application follows a modular monolithic architecture with clear separation 
 ## External Dependencies
 
 - **discord.py**: Core Discord API interaction and bot framework
-- **aiosqlite**: Async SQLite database operations
+- **asyncpg**: Async PostgreSQL database operations with connection pooling
 - **aiohttp**: Web server for dashboard functionality
 - **aiohttp-cors**: CORS support for web dashboard
-- **python-dotenv**: Environment variable management (implied)
+- **python-dotenv**: Environment variable management
 
 ## Deployment Strategy
 
@@ -114,7 +115,13 @@ The bot is designed for containerized deployment with the following consideratio
 
 ## Changelog
 
-- July 05, 2025. Initial setup
+- July 06, 2025: Enhanced Discord bot with PostgreSQL database integration
+  - Added PostgreSQL database with connection pooling
+  - Implemented comprehensive database analytics and monitoring
+  - Enhanced web dashboard with database metrics and real-time updates
+  - Added command usage tracking, error logging, and bot statistics history
+  - Created advanced database schema with optimized indexes
+- July 05, 2025: Initial setup
 
 ## User Preferences
 

@@ -34,6 +34,8 @@ class WebDashboard:
         self.app.router.add_get('/api/guilds', self.get_guilds)
         self.app.router.add_get('/api/commands', self.get_commands)
         self.app.router.add_get('/api/errors', self.get_errors)
+        self.app.router.add_get('/api/analytics', self.get_analytics)
+        self.app.router.add_get('/api/database-status', self.get_database_status)
         self.app.router.add_get('/ws', self.websocket_handler)
         
         # Static files
@@ -123,13 +125,18 @@ class WebDashboard:
             return web.json_response({'error': str(e)}, status=500)
     
     async def get_commands(self, request):
-        """Get command usage statistics"""
+        """Get command usage statistics from database"""
         try:
-            command_stats = getattr(self.bot, 'command_stats', {})
+            # Get command statistics from database
+            if hasattr(self.bot, 'db_manager') and self.bot.db_manager.pool:
+                db_stats = await self.bot.db_manager.get_command_statistics()
+                command_usage = {stat['command_name']: stat['usage_count'] for stat in db_stats}
+            else:
+                command_usage = getattr(self.bot, 'command_stats', {})
             
             commands = []
             for cmd in self.bot.tree.get_commands():
-                usage_count = command_stats.get(cmd.name, 0)
+                usage_count = command_usage.get(cmd.name, 0)
                 commands.append({
                     'name': cmd.name,
                     'description': cmd.description,
@@ -143,12 +150,11 @@ class WebDashboard:
             return web.json_response({'error': str(e)}, status=500)
     
     async def get_errors(self, request):
-        """Get recent errors"""
+        """Get recent errors from database"""
         try:
-            # Get recent errors from database if available
-            if hasattr(self.bot, 'db_manager'):
-                # This would require implementing get_recent_errors in DatabaseManager
-                errors = []
+            # Get recent errors from database
+            if hasattr(self.bot, 'db_manager') and self.bot.db_manager.pool:
+                errors = await self.bot.db_manager.get_recent_errors(limit=20)
             else:
                 errors = []
             
@@ -156,6 +162,61 @@ class WebDashboard:
             
         except Exception as e:
             logger.error(f"Error getting errors: {e}")
+            return web.json_response({'error': str(e)}, status=500)
+    
+    async def get_analytics(self, request):
+        """Get advanced analytics data"""
+        try:
+            analytics = {}
+            
+            if hasattr(self.bot, 'db_manager') and self.bot.db_manager.pool:
+                # Get command statistics
+                command_stats = await self.bot.db_manager.get_command_statistics()
+                analytics['command_stats'] = command_stats
+                
+                # Get bot statistics history
+                stats_history = await self.bot.db_manager.get_bot_statistics_history(hours=24)
+                analytics['stats_history'] = stats_history
+                
+                # Get recent errors summary
+                recent_errors = await self.bot.db_manager.get_recent_errors(limit=10)
+                analytics['recent_errors'] = recent_errors
+                
+            return web.json_response(analytics)
+            
+        except Exception as e:
+            logger.error(f"Error getting analytics: {e}")
+            return web.json_response({'error': str(e)}, status=500)
+    
+    async def get_database_status(self, request):
+        """Get database connection status and info"""
+        try:
+            status = {
+                'connected': False,
+                'type': 'PostgreSQL',
+                'pool_size': 0,
+                'total_commands': 0,
+                'total_errors': 0
+            }
+            
+            if hasattr(self.bot, 'db_manager') and self.bot.db_manager.pool:
+                status['connected'] = True
+                status['pool_size'] = len(self.bot.db_manager.pool._holders)
+                
+                # Get database statistics
+                async with self.bot.db_manager.pool.acquire() as conn:
+                    # Count total commands
+                    total_commands = await conn.fetchval('SELECT COUNT(*) FROM command_usage')
+                    status['total_commands'] = total_commands
+                    
+                    # Count total errors
+                    total_errors = await conn.fetchval('SELECT COUNT(*) FROM error_logs')
+                    status['total_errors'] = total_errors
+            
+            return web.json_response(status)
+            
+        except Exception as e:
+            logger.error(f"Error getting database status: {e}")
             return web.json_response({'error': str(e)}, status=500)
     
     async def websocket_handler(self, request):

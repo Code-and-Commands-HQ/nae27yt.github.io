@@ -134,7 +134,8 @@ class EnhancedDashboard {
             await Promise.all([
                 this.loadStats(),
                 this.loadServers(),
-                this.loadCommands()
+                this.loadCommands(),
+                this.loadDatabaseStatus()
             ]);
         } catch (error) {
             console.error('Error loading initial data:', error);
@@ -176,6 +177,18 @@ class EnhancedDashboard {
             this.updateCommandUsageTable(commands);
         } catch (error) {
             console.error('Error loading commands:', error);
+        }
+    }
+
+    async loadDatabaseStatus() {
+        try {
+            const response = await fetch('/api/database-status');
+            if (!response.ok) throw new Error('Failed to fetch database status');
+            
+            const dbStatus = await response.json();
+            this.updateDatabaseStatus(dbStatus);
+        } catch (error) {
+            console.error('Error loading database status:', error);
         }
     }
 
@@ -281,6 +294,23 @@ class EnhancedDashboard {
         `).join('');
     }
 
+    updateDatabaseStatus(dbStatus) {
+        // Update database metrics
+        document.getElementById('db-total-commands').textContent = dbStatus.total_commands?.toLocaleString() || '0';
+        document.getElementById('db-total-errors').textContent = dbStatus.total_errors?.toLocaleString() || '0';
+        document.getElementById('db-pool-size').textContent = dbStatus.pool_size || '0';
+        
+        // Update database status
+        const statusElement = document.getElementById('db-status');
+        if (dbStatus.connected) {
+            statusElement.textContent = 'Connected';
+            statusElement.className = 'text-success';
+        } else {
+            statusElement.textContent = 'Disconnected';
+            statusElement.className = 'text-danger';
+        }
+    }
+
     initializeChart() {
         const ctx = document.getElementById('commandChart').getContext('2d');
         this.commandChart = new Chart(ctx, {
@@ -352,6 +382,7 @@ class EnhancedDashboard {
         setInterval(() => {
             if (!document.hidden) {
                 this.loadStats();
+                this.loadDatabaseStatus();
             }
         }, 30000);
     }

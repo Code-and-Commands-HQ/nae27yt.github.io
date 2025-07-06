@@ -46,8 +46,13 @@ class GeneralCommands(commands.Cog, name="General"):
             # Send the message
             await interaction.response.send_message(cleaned_message)
             
-            # Track usage
-            self._track_command_usage("say", interaction.user.id)
+            # Track usage in database
+            if hasattr(self.bot, 'db_manager') and self.bot.db_manager.pool:
+                await self.bot.db_manager.log_command_usage(
+                    "say", 
+                    interaction.user.id, 
+                    interaction.guild.id if interaction.guild else None
+                )
             
         except Exception as e:
             logger.error(f"Error in say command: {e}")
@@ -92,8 +97,13 @@ class GeneralCommands(commands.Cog, name="General"):
             
             await interaction.response.send_message(embed=embed)
             
-            # Track usage
-            self._track_command_usage("embed", interaction.user.id)
+            # Track usage in database
+            if hasattr(self.bot, 'db_manager') and self.bot.db_manager.pool:
+                await self.bot.db_manager.log_command_usage(
+                    "embed", 
+                    interaction.user.id, 
+                    interaction.guild.id if interaction.guild else None
+                )
             
         except Exception as e:
             logger.error(f"Error in embed command: {e}")

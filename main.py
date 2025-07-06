@@ -13,7 +13,7 @@ import sys
 import signal
 from datetime import datetime
 from bot_config import BotConfig
-from utils.database import DatabaseManager
+from utils.postgres_database import PostgreSQLManager
 from web_dashboard import WebDashboard
 
 # Configure logging with better formatting
@@ -44,7 +44,7 @@ class DiscordBot(commands.Bot):
         )
         
         # Initialize components
-        self.db_manager = DatabaseManager()
+        self.db_manager = PostgreSQLManager()
         self.web_dashboard = WebDashboard(self)
         self.startup_time = datetime.now()
         self.command_stats = {}
