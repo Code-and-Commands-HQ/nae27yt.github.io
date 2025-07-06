@@ -29,6 +29,7 @@ class WebDashboard:
         """Setup web routes"""
         # Static routes
         self.app.router.add_get('/', self.dashboard_page)
+        self.app.router.add_get('/enhanced', self.enhanced_dashboard_page)
         self.app.router.add_get('/api/stats', self.get_stats)
         self.app.router.add_get('/api/guilds', self.get_guilds)
         self.app.router.add_get('/api/commands', self.get_commands)
@@ -53,13 +54,28 @@ class WebDashboard:
             cors.add(route)
     
     async def dashboard_page(self, request):
-        """Serve the dashboard HTML page"""
+        """Serve the enhanced dashboard HTML page by default"""
         try:
-            with open('static/dashboard.html', 'r') as f:
+            with open('static/enhanced-dashboard.html', 'r') as f:
                 content = f.read()
             return web.Response(text=content, content_type='text/html')
         except FileNotFoundError:
-            return web.Response(text="Dashboard not found", status=404)
+            # Fallback to basic dashboard
+            try:
+                with open('static/dashboard.html', 'r') as f:
+                    content = f.read()
+                return web.Response(text=content, content_type='text/html')
+            except FileNotFoundError:
+                return web.Response(text="Dashboard not found", status=404)
+    
+    async def enhanced_dashboard_page(self, request):
+        """Serve the enhanced dashboard HTML page"""
+        try:
+            with open('static/enhanced-dashboard.html', 'r') as f:
+                content = f.read()
+            return web.Response(text=content, content_type='text/html')
+        except FileNotFoundError:
+            return web.Response(text="Enhanced dashboard not found", status=404)
     
     async def get_stats(self, request):
         """Get bot statistics"""
@@ -172,10 +188,10 @@ class WebDashboard:
             message_type = data.get('type')
             
             if message_type == 'ping':
-                await ws.send_text(json.dumps({'type': 'pong'}))
+                await ws.send_str(json.dumps({'type': 'pong'}))
             elif message_type == 'get_stats':
                 stats = await self.get_stats_data()
-                await ws.send_text(json.dumps({'type': 'stats', 'data': stats}))
+                await ws.send_str(json.dumps({'type': 'stats', 'data': stats}))
             
         except Exception as e:
             logger.error(f"Error handling WebSocket message: {e}")
@@ -207,7 +223,7 @@ class WebDashboard:
             disconnected = set()
             for ws in self.websockets:
                 try:
-                    await ws.send_text(message)
+                    await ws.send_str(message)
                 except Exception:
                     disconnected.add(ws)
             
