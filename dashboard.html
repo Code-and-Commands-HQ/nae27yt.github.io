@@ -1,3 +1,41 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PSA Dashboard</title>
+    <link rel="stylesheet" href="dashboard.css">
+</head>
+<body>
+
+<div class="background">
+    <div class="bg-layer layer1"></div>
+    <div class="bg-layer layer2"></div>
+    <div class="bg-layer layer3"></div>
+</div>
+
+<div class="dashboard-container">
+    <div class="logo">
+        <h1>PROJECT SAN ANDREAS</h1>
+    </div>
+
+    <div class="dashboard-card">
+        <h2>Welcome Back</h2>
+        <p>This is your futuristic PSA dashboard panel.</p>
+
+        <button class="ripple-btn" onclick="logout()">Logout</button>
+    </div>
+</div>
+
+<script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js"></script>
+<script src="dashboard.js"></script>
+
+</body>
+</html>
+
+
+
 <script>
 auth.onAuthStateChanged(user => {
     if (!user) {
