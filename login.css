@@ -1,0 +1,161 @@
+:root {
+    --bg-color: #0a0a0f;
+    --card-bg: rgba(255, 255, 255, 0.06);
+    --text-color: #e5e5e5;
+    --accent: #00eaff;
+    --accent-glow: 0 0 20px #00eaff;
+}
+
+body {
+    margin: 0;
+    height: 100vh;
+    background: var(--bg-color);
+    overflow: hidden;
+    font-family: 'Inter', sans-serif;
+    color: var(--text-color);
+}
+
+/* Cinematic Background Layers */
+.background {
+    position: fixed;
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+}
+
+.bg-layer {
+    position: absolute;
+    width: 200%;
+    height: 200%;
+    background: radial-gradient(circle, rgba(0,234,255,0.15), transparent 70%);
+    animation: float 20s infinite linear;
+}
+
+.layer1 { animation-duration: 25s; }
+.layer2 { animation-duration: 35s; transform: rotate(45deg); }
+.layer3 { animation-duration: 45s; transform: rotate(90deg); }
+
+@keyframes float {
+    0% { transform: translate(-20%, -20%) scale(1); }
+    50% { transform: translate(20%, 20%) scale(1.2); }
+    100% { transform: translate(-20%, -20%) scale(1); }
+}
+
+/* Login Container */
+.login-container {
+    position: relative;
+    z-index: 10;
+    height: 100vh;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+}
+
+/* Logo Reveal */
+.logo h1 {
+    font-size: 2.2rem;
+    letter-spacing: 4px;
+    opacity: 0;
+    animation: fadeIn 2s forwards ease-out;
+    text-shadow: var(--accent-glow);
+}
+
+@keyframes fadeIn {
+    to { opacity: 1; transform: translateY(0); }
+}
+
+/* Login Card */
+.login-card {
+    margin-top: 30px;
+    width: 350px;
+    padding: 30px;
+    border-radius: 15px;
+    backdrop-filter: blur(20px);
+    background: var(--card-bg);
+    border: 1px solid rgba(255,255,255,0.1);
+    box-shadow: 0 0 25px rgba(0,234,255,0.15);
+    animation: slideUp 1.2s ease-out;
+}
+
+@keyframes slideUp {
+    from { opacity: 0; transform: translateY(40px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+/* Floating Inputs */
+.input-group {
+    position: relative;
+    margin-bottom: 25px;
+}
+
+.input-group input {
+    width: 100%;
+    padding: 12px;
+    background: transparent;
+    border: none;
+    border-bottom: 2px solid rgba(255,255,255,0.2);
+    color: var(--text-color);
+    font-size: 1rem;
+    outline: none;
+    transition: 0.3s;
+}
+
+.input-group input:focus {
+    border-bottom-color: var(--accent);
+    box-shadow: 0 4px 10px rgba(0,234,255,0.2);
+}
+
+.input-group label {
+    position: absolute;
+    left: 0;
+    top: 12px;
+    color: rgba(255,255,255,0.5);
+    transition: 0.3s;
+}
+
+input:focus + label,
+input:valid + label {
+    top: -10px;
+    font-size: 0.8rem;
+    color: var(--accent);
+}
+
+/* Ripple Button */
+.ripple-btn {
+    width: 100%;
+    padding: 12px;
+    background: var(--accent);
+    border: none;
+    border-radius: 8px;
+    color: #000;
+    font-weight: bold;
+    cursor: pointer;
+    position: relative;
+    overflow: hidden;
+    box-shadow: var(--accent-glow);
+}
+
+.ripple-btn:active::after {
+    content: "";
+    position: absolute;
+    width: 200%;
+    height: 200%;
+    background: rgba(255,255,255,0.4);
+    border-radius: 50%;
+    transform: translate(-50%, -50%);
+    animation: ripple 0.6s ease-out;
+}
+
+@keyframes ripple {
+    from { transform: scale(0); opacity: 1; }
+    to { transform: scale(2); opacity: 0; }
+}
+
+#errorMsg {
+    margin-top: 10px;
+    color: #ff4d4d;
+    text-align: center;
+    opacity: 0;
+    transition: 0.3s;
+}
