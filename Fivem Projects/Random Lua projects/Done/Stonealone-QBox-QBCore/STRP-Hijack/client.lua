@@ -21,29 +21,37 @@ local function oxLibNotify(message)
     end
 end
 
-local function runProgressBar()
-    local data = {
-        duration = 10000,
-        label = 'Hijacking vehicle',
-        useWhileDead = false,
-        canCancel = true,
-        disable = {
-            car = true,
-            move = true,
-            combat = true,
-        },
-    }
-
-    if exports.ox_lib and type(exports.ox_lib.progressBar) == 'function' then
-        return exports.ox_lib:progressBar(data)
-    elseif lib and type(lib.progressBar) == 'function' then
-        return lib.progressBar(data)
+local function playLockpickAnimation()
+    local playerPed = PlayerPedId()
+    RequestAnimDict('veh_drug_play')
+    while not HasAnimDictLoaded('veh_drug_play') do
+        Wait(0)
     end
+    TaskPlayAnim(playerPed, 'veh_drug_play', 'veh_drug_use', 8.0, -8.0, -1, 1, 0, false, false, false)
+end
 
-    local start = GetGameTimer()
-    while GetGameTimer() - start < data.duration do
-        Wait(50)
+local function stopLockpickAnimation()
+    local playerPed = PlayerPedId()
+    StopAnimTask(playerPed, 'veh_drug_play', 'veh_drug_use', 1.0)
+    RemoveAnimDict('veh_drug_play')
+end
+
+local function runLockpickGame()
+    local playerPed = PlayerPedId()
+    
+    -- Play lockpicking animation
+    playLockpickAnimation()
+    
+    if exports.ox_lib and type(exports.ox_lib.minigame) == 'function' then
+        local result = exports.ox_lib:minigame('lockpick', {
+            difficulty = 1,
+        })
+        stopLockpickAnimation()
+        return result
     end
+    
+    -- Fallback if ox_lib not available
+    stopLockpickAnimation()
     return true
 end
 
@@ -130,8 +138,8 @@ local function registerTarget(vehicle)
                 end
 
                 hijacking = true
-                if not runProgressBar() then
-                    oxLibNotify('Hijack cancelled.')
+                if not runLockpickGame() then
+                    oxLibNotify('Lockpicking failed.')
                     hijacking = false
                     return
                 end
